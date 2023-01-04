@@ -12,7 +12,7 @@ jobs:
       uses: tj-actions/changed-files@v14.6
     - uses: suhasgumma/github-action@main
       with:
-        files: ${{ steps.changed-files.outputs.all_changed_files }}
+        # files: ${{ steps.changed-files.outputs.all_changed_files }}
         suggestFix: true
     - uses: peter-evans/create-pull-request@v4
       with:
