@@ -14,7 +14,7 @@ jobs:
       latest_tag: ${{ steps.get_latest_tag.outputs.latest_tag }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
@@ -25,7 +25,8 @@ jobs:
         id: get_latest_tag
         run: |
           latest_tag=$(git tag -l | sort -V | tail -n 1)
-          echo "latest_tag=$latest_tag" >> $GITHUB_ENV
+          echo "latest tag: $latest_tag"
+          echo "LATEST_TAG=$latest_tag" >> $GITHUB_ENV
 
   build:
     runs-on: ubuntu-latest
@@ -48,18 +49,18 @@ jobs:
         run: pip install -r requirements.txt
       
       - name: print latest tag
-        run: echo ${{ needs.fetch-latest-tag.outputs.latest_tag }}
+        run: echo ${{ env.LATEST_TAG }}
       
       - name: print action
         run: echo ${{ github.event.action }}
 
       - name: Update doc site for release
-        if: github.event.action == 'released' && github.ref_name == needs.fetch-latest-tag.outputs.latest_tag
+        if: github.event.action == 'released' && github.ref_name == env.LATEST_TAG
         working-directory: doc-site
         run: mike deploy ${{ github.event.release.tag_name }} --push
 
       - name: Update doc site for latest release
-        if: github.event.action == 'released' && github.ref_name == needs.fetch-latest-tag.outputs.latest_tag
+        if: github.event.action == 'released' && github.ref_name == env.LATEST_TAG
         working-directory: doc-site
         run: mike deploy ${{ github.event.release.tag_name }} latest -u --push
 
